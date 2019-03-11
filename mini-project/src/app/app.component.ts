@@ -14,7 +14,7 @@ export class AppComponent {
   constructor(private http: HttpClient) { }
 
   ngOnInit(){
-    this.http.get('http://localhost:8080/api2/miniproject/AuthorService/test')
+    this.http.get('http://localhost:8080/api/miniproject/AuthorService/test')
     .subscribe((data)=>{
       console.log(data);
 
@@ -22,5 +22,7 @@ export class AppComponent {
     });
   
   }
+
+
 }
 
