@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-login',
@@ -29,8 +30,10 @@ export class LoginComponent implements OnInit {
 
     console.log(loginData);
 
+    AppComponent.onShowLoader(1);
     this.http.post("http://localhost:8080/api/miniproject/login/auth",loginData)
     .subscribe((data)=>{
+      AppComponent.onShowLoader(0);
         console.log(data);
         if(data['auth']==true){
           localStorage.setItem("user",loginData.username);
