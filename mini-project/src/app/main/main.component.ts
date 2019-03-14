@@ -4,24 +4,24 @@ import { HttpClient } from '@angular/common/http';
 import { AppComponent } from '../app.component';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  selector: 'app-main',
+  templateUrl: './main.component.html',
+  styleUrls: ['./main.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class MainComponent implements OnInit {
 
   user : any = {
     "username" : "",
     "password" : ""
   }
-  username : any;
-  hideButton: string;
-  messageVisibility: string = "none";
+  approved_date = "2019/03/14";
+  expiry_date = "2020/03/14";
+  balance = 150;
   serverError: string;
+
   constructor(private route:Router, private http:HttpClient) { }
 
   ngOnInit() {
-   
     this.user.username = localStorage.getItem("user");
     this.user.password = localStorage.getItem("key");
 
@@ -31,51 +31,43 @@ export class DashboardComponent implements OnInit {
       
     }
 
+    //fetch bank balance and locker issued and expiry date
     AppComponent.onShowLoader(1);
-    this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_request",this.user)
+    this.http.post("http://localhost:8080/api/miniproject/customer2bank/balance",this.user)
     .subscribe(response=>{
     AppComponent.onShowLoader(0);
-      console.log(response['status']);
-      if(response['status'] == 4){
-        this.route.navigate(['\main']);
-      }else if (response['status'] == 3){
-        this.hideButton = "none";
-        this.messageVisibility = "block";
-      }
-      
+      console.log(response);
+      this.balance = response['balance'];
     },
     error=>{
       AppComponent.onShowLoader(0);
       console.log(error);
       this.serverError = "Server Unavailable";
     });
+
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/customer2bank/locker_issued_expiry_date",this.user)
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response);
+      this.approved_date = response['issued'];
+      this.expiry_date = response['expiry'];
+
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+      this.serverError = "Server Unavailable";
+    });
+
+    /*
+      compare and expiry date with current date if current date is exceeds the expiry then call api to deduct money from user account and refresh current page.
+    */
   }
 
   logout(){
     localStorage.clear();
-    history.back();
-  }
-
-  request_locker(){
-    console.log("requested");
-    
-    AppComponent.onShowLoader(1);
-    this.http.post("http://localhost:8080/api/miniproject/customer2bank/locker_request",this.user)
-    .subscribe(response=>{
-    AppComponent.onShowLoader(0);
-      console.log(response);
-      this.hideButton = "none";
-      this.messageVisibility = "block";
-    },
-    error=>{
-      AppComponent.onShowLoader(0);
-      console.log(error);
-      this.serverError = "Server Unavailable";
-    });
-    
-
-
-
+    history.go(-2);
   }
 
 }

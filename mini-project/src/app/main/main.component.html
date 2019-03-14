@@ -15,16 +15,11 @@
   </div>
 </nav>
 
-<div class="row">
+<div class="row information">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
-    <button class="commonButtonDesign" (click)="request_locker()" [ngStyle] = "{'display' : hideButton}" >Apply For Locker</button>
-
-    
+      <label>Locker Issue Date  : {{approved_date}}</label><br>
+      <label>Locker Expiry Date : {{expiry_date}}</label><br>
+      <label>Bank Balance : {{balance}} rupees</label><br>
+      (Locker charges will be deducted on {{expiry_date}})
   </div>
-  
-  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-    <label [ngStyle] = "{'display' : messageVisibility}">You have requested for locker. Please check and try to login after 24 hours. you will be redirected to the panel once bank apporves your locker application</label>
-  </div>
-  
-
 </div>

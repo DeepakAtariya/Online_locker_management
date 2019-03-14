@@ -12,6 +12,7 @@ package ignou.miniproject;
 import ignou.miniproject.model.Users;
 import ignou.miniproject.model.Bank;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.ws.rs.Consumes;
  
 import javax.ws.rs.POST;
@@ -64,26 +65,133 @@ public class BankService {
 //                .build();
         
         
-            }
-    
-    /*
-    @GET
-    @Path("/test")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getJSONData(
-        @FormParam("name") String name
-    ){
-        
-        JSONObject json = new JSONObject();
-        json.put("name",name);
-        json.put("code","1010011");
-        json.put("age",21);
-//        return String.valueOf(json);
-        return Response.status(200)
-            .entity("got"+name)
-            .build();
-
     }
-     */
+
+    @POST
+    @Path("/check_locker_request")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response check_locker_Request( String login_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(login_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+//        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            int is_requested;
+            is_requested = this.bank.check_locker_request(username);
+            
+            result_json.put("status", is_requested);
+            return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
+
+//        return Response.status(200)
+//                .entity((login_json))
+//                .build();
+        
+        
+    }
+    
+    @POST
+    @Path("/balance")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getBalance( String login_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(login_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+//        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            int balance;
+            balance = this.bank.getBalance(username);
+            
+            result_json.put("balance", balance);
+            return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
+//
+//        return Response.status(200)
+//                .entity((login_json))
+//                .build();
+        
+        
+    }
+    
+    @POST
+    @Path("/locker_issued_expiry_date")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response locker_issued_expiry_date( String login_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(login_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+//        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            ArrayList dates;
+            dates = this.bank.locker_issued_expiry_date(username);
+            
+            result_json.put("issued", dates.get(0));
+            result_json.put("expiry", dates.get(1));
+            return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
+
+//        return Response.status(200)
+//                .entity((login_json))
+//                .build();
+        
+        
+    }
+    
+
+//    @GET
+//    @Path("/test")
+//    @Produces(MediaType.TEXT_PLAIN)
+//    public Response getJSONData(){
+//        
+//        JSONObject json = new JSONObject();
+//        json.put("name",name);
+//        json.put("code","1010011");
+//        json.put("age",21);
+////        return String.valueOf(json);
+//        return Response.status(200)
+//            .entity("got")
+//            .build();
+//
+//    }
+
      
 }

@@ -9,6 +9,7 @@ import { LoginComponent } from './login/login.component';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { MainComponent } from './main/main.component';
 
 const appRoutes : Routes = [
   {
@@ -16,7 +17,11 @@ const appRoutes : Routes = [
   },
   {
     path : '\dashboard', component : DashboardComponent
+  },
+  {
+    path : '\main', component : MainComponent
   }
+
 
 ];
 
@@ -24,7 +29,8 @@ const appRoutes : Routes = [
   declarations: [
     AppComponent,
     LoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,

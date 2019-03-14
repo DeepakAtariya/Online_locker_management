@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -41,6 +42,87 @@ public class Bank {
         int rs = stmt.executeUpdate();
         
         return rs;
+    }
+    
+    public int check_locker_request(String username) throws SQLException {
+        
+        this.conn = Conn.getMysqlConnection();
+//        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`) values((SELECT id FROM users where username=?),?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT * FROM addlocker_request where customer = (SELECT id FROM users where username=?)");
+        
+        stmt.setString(1,username);
+        
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next()){
+            Date request_date = rs.getDate("request_date");
+            if(request_date!=null){
+                
+                Date approved_date = rs.getDate("approved_date");
+                if(approved_date!=null){
+                    return 4;
+                }else{
+                    return 3;
+                }
+            }
+            
+        }
+        
+        return 0;
+        
+        
+    }
+        
+    public int getBalance(String username) throws SQLException {
+        
+        this.conn = Conn.getMysqlConnection();
+//        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`) values((SELECT id FROM users where username=?),?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT * FROM users where username=?");
+        
+        stmt.setString(1,username);
+        
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next()){
+            int balance = rs.getInt("balance");
+            return balance;
+        }
+        
+        return 0;
+        
+        
+    }
+    
+    public ArrayList locker_issued_expiry_date(String username) throws SQLException {
+        
+        this.conn = Conn.getMysqlConnection();
+//        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`) values((SELECT id FROM users where username=?),?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT * FROM addlocker_request where customer = (SELECT id FROM users where username=?)");
+        
+        stmt.setString(1,username);
+        
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next()){
+            Date approved_date = rs.getDate("approved_date");
+            Date expiry_date = rs.getDate("expiry_date");
+            
+            String approved = new SimpleDateFormat("yyyy/MM/dd").format(approved_date);
+            String expiry = new SimpleDateFormat("yyyy/MM/dd").format(expiry_date);
+            
+            ArrayList datelist = new ArrayList();
+            datelist.add(approved);
+            datelist.add(expiry);
+            
+            return datelist;
+        }
+        
+        return null;
+        
+        
     }
     
     /**
