@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,18 +10,25 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
 
-  username : any ;
+  user : any = {
+    "username" : "",
+    "password" : ""
+  }
+  username : any;
   hideButton: string;
   messageVisibility: string = "none";
-  constructor(private route:Router) { }
+  serverError: string;
+  constructor(private route:Router, private http:HttpClient) { }
 
   ngOnInit() {
-    this.username = localStorage.getItem("user");
+   
+    this.user.username = localStorage.getItem("user");
+    this.user.password = localStorage.getItem("key");
 
-    if(this.username==null){
+    if(this.user.username==null){
       this.route.navigate(['']);
     }else{
-
+      
     }
   }
 
@@ -30,8 +39,25 @@ export class DashboardComponent implements OnInit {
 
   request_locker(){
     console.log("requested");
-    this.hideButton = "none";
-    this.messageVisibility = "block";
+    
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/customer2bank/locker_request",this.user)
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response);
+      this.hideButton = "none";
+      this.messageVisibility = "block";
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+      this.serverError = "Server Unavailable";
+    }
+    );
+    
+
+
+
   }
 
 }
