@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AppComponent } from '../app.component';
 import { NgForm } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 declare var $: any;
 
@@ -32,11 +33,15 @@ export class MainComponent implements OnInit {
   warning: string;
   formHide: string;
   lockeraccesspending_message: string = "none";
+  access_id : any;
+  records : any;
+  hide_blank : string;
 
   constructor(private route:Router, private http:HttpClient) { }
   @ViewChild('request') requestdata : NgForm;
 
   ngOnInit() {
+
     this.user.username = localStorage.getItem("user");
     this.user.password = localStorage.getItem("key");
 
@@ -46,19 +51,17 @@ export class MainComponent implements OnInit {
       
     }
     
-    //check the locker status and show old records of locker access request(if any)
+    //check the locker status and show old records of locker access request(if any) 
     AppComponent.onShowLoader(1);
-      this.http.post("http://localhost:8080/api/miniproject/customer2bank/approvedlockerrequests",this.request_data)
-      .subscribe(
-      response=>{
-        AppComponent.onShowLoader(0);
+      this.http.post("http://localhost:8080/api/miniproject/customer2bank/approvedlockerrequests",this.user)
+      .subscribe(response=>{
+        
         console.log(response);
 
-        //hide the form and show message of locker access apointment
-        this.formHide = "none";
-        this.lockeraccesspending_message ="block";
+        this.records = response['approvals'];
+        this.hide_blank = "none";
         
-
+        AppComponent.onShowLoader(0);
       },
       error=>{
         AppComponent.onShowLoader(0);
@@ -67,21 +70,24 @@ export class MainComponent implements OnInit {
 
     //check the locker status and show the pending message (if any request is pending) and hide locker acceess request form
     AppComponent.onShowLoader(1);
-      this.http.post("http://localhost:8080/api/miniproject/customer2bank/checkpendinglockeraccessrequest",this.request_data)
+      this.http.post("http://localhost:8080/api/miniproject/customer2bank/checkpendinglockeraccessrequest",this.user)
       .subscribe(
       response=>{
         AppComponent.onShowLoader(0);
         console.log(response);
 
-        //hide the form and show message of locker access apointment
-        this.formHide = "none";
-        this.lockeraccesspending_message ="block";
-        
-
+        //hide the form and show message of locker access apointment if LockerAccessId is not a 0
+        if(response['LockerAccessId']!=0){
+          this.access_id = response['LockerAccessId'];
+          this.formHide = "none";
+          this.lockeraccesspending_message ="block";
+        }else{
+          this.formHide = "block";
+          this.lockeraccesspending_message ="none";
+        }
       },
       error=>{
         AppComponent.onShowLoader(0);
-        
       });
 
 
@@ -90,7 +96,7 @@ export class MainComponent implements OnInit {
     this.http.post("http://localhost:8080/api/miniproject/customer2bank/balance",this.user)
     .subscribe(response=>{
     AppComponent.onShowLoader(0);
-      console.log(response);
+      // console.log(response);
       this.balance = response['balance'];
     },
     error=>{
@@ -103,7 +109,7 @@ export class MainComponent implements OnInit {
     this.http.post("http://localhost:8080/api/miniproject/customer2bank/locker_issued_expiry_date",this.user)
     .subscribe(response=>{
     AppComponent.onShowLoader(0);
-      console.log(response);
+      // console.log(response);
       this.approved_date = response['issued'];
       this.expiry_date = response['expiry'];
 
@@ -117,13 +123,17 @@ export class MainComponent implements OnInit {
     /*
       compare and expiry date with current date if current date is exceeds the expiry then call api to deduct money from user account and refresh current page.
     */
-  }
+  } //end ngInit
+
+
 
   logout(){
     localStorage.clear();
     history.go(-2);
   }
 
+
+  // locker appointment
   accessrequest(){
     // console.log(this.requestdata.value.requestData);
     this.request_data.Date = this.requestdata.value.requestData.date;
@@ -132,9 +142,16 @@ export class MainComponent implements OnInit {
     this.request_data.password = this.user.password;
 
     this.warning = "";
+    var datePipe = new DatePipe("en-US");
+    var currentDate = datePipe.transform(new Date(),'dd/MM/yyyy');
+
+    var givenDate = datePipe.transform(this.request_data.Date, "dd/MM/yyyy");
+    // console.log(val2>val); 
 
     if(this.request_data.Date == "" || this.request_data.Time == ""){
       this.warning = "Schedule is invalid";
+    }else if (currentDate > givenDate){
+      this.warning = "Schedule is underflowed";
     }else{
       this.warning = "";
 
@@ -148,20 +165,18 @@ export class MainComponent implements OnInit {
         //hide the form and show message of locker access apointment
         this.formHide = "none";
         this.lockeraccesspending_message ="block";
-        
 
+        
       },
       error=>{
         AppComponent.onShowLoader(0);
         
       });
-
-      
-
-
     }
 
     // console.log(this.request_data);
+    // this.route.navigate(['\main']);
+    history.go(0);
   }
 
 

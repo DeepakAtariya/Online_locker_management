@@ -18,7 +18,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 //import static javax.ws.rs.HttpMethod.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
@@ -40,7 +39,7 @@ public class BankService {
         JSONObject json = (JSONObject) parser.parse(login_json);
         String username = (String) json.get("username");
         String password = (String) json.get("password");
-//        
+
         // pass the username and password for authentication from database
         this.users = new Users();
         this.bank = new Bank();
@@ -59,12 +58,6 @@ public class BankService {
             result_json.put("status", result);
             return Response.status(200).entity(result_json.toString()).build();
         }
-
-//        return Response.status(200)
-//                .entity((login_json))
-//                .build();
-        
-        
     }
 
     @POST
@@ -173,6 +166,110 @@ public class BankService {
 //                .entity((login_json))
 //                .build();
         
+        
+    }
+    
+    @POST
+    @Path("/lockeraccessrequest")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response lockerAccessRequest( String request_data_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(request_data_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+        String date = (String)json.get("Date");
+        String time = (String)json.get("Time");
+//        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            int requested;
+            requested = this.bank.addLockerAccessRequest(username, date, time);
+            
+            result_json.put("requested", requested);
+            return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
+
+//        return Response.status(200)
+//                .entity((login_json))
+//                .build();
+        
+        
+    }
+    
+    @POST
+    @Path("/checkpendinglockeraccessrequest")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response checkPendingLockerAccessRequest( String request_data_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(request_data_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            int locker_access_id;
+            locker_access_id = this.bank.checkPendingLockerAccessRequest(username);
+            
+            // if locker_access_id is 0 then no pending request is there
+            result_json.put("LockerAccessId", locker_access_id);
+            return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
+        
+    }
+    
+    @POST
+    @Path("/approvedlockerrequests")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response approvedlockerrequests( String request_data_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(request_data_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            JSONObject approvals;
+            approvals = this.bank.approvedLockerRequests(username);
+            
+            // if locker_access_id is 0 then no pending request is there
+//            result_json.put("checking", "checked");
+            return Response.status(200).entity(approvals.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
         
     }
     

@@ -12,7 +12,11 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -32,13 +36,24 @@ public class Bank {
     public int locker_request(String username) throws SQLException {
         
         this.conn = Conn.getMysqlConnection();
-        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`) values((SELECT id FROM users where username=?),?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`,`expiry_date`) values((SELECT id FROM users where username=?),?) ");
         
         stmt.setString(1,username);
         
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         stmt.setString(2,dateFormat.format(new Date()));
         
+//        Calendar cal = Calendar.getInstance();
+//        Date today = cal.getTime();
+//        System.out.println("================================="+today+"================================================================");
+//        cal.add(Calendar.YEAR, 1); // to get previous year add 1
+//        cal.add(Calendar.DAY_OF_MONTH, -1); // to get previous day add -1
+//        Date expiryDate = cal.getTime();
+//        System.out.println("================================="+expiryDate+"================================================================");
+//        
+//
+//        stmt.setString(3,dateFormat.format(expiryDate));
+//        
         int rs = stmt.executeUpdate();
         
         return rs;
@@ -125,6 +140,95 @@ public class Bank {
         
     }
     
+    public int addLockerAccessRequest(String username, String date, String time) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        PreparedStatement stmt=this.conn.prepareStatement("insert into access_locker (`locker_id`,`date`,`time`,`permission`) values((SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer where users.username=?),?,?,?) ");
+        
+        stmt.setString(1,username);
+        stmt.setString(2,date);
+        stmt.setString(3,time);
+        stmt.setInt(4,0);
+        
+        
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        stmt.setString(2,dateFormat.format(new Date()));
+        
+        int rs = stmt.executeUpdate();
+        
+        return rs;
+
+    }
+    
+    /**
+     * checkPendingLockerAccessRequest : this method checks for pending request and return 'access id' of that request
+     */
+    
+        
+    public int checkPendingLockerAccessRequest(String username) throws SQLException {
+        
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.id FROM access_locker INNER JOIN addlocker_request ON addlocker_request.id=(SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer WHERE users.username=?) WHERE access_locker.permission=0");
+        
+        stmt.setString(1,username);
+        
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next()){
+            
+            int access_id = rs.getInt("id");
+            return access_id;
+            
+        }
+        
+        return 0;
+        
+        
+    }
+    
+    /**
+     * checkPendingLockerAccessRequest : this method checks for pending request and return 'access id' of that request
+     */
+    
+        
+    public JSONObject approvedLockerRequests(String username) throws SQLException {
+        
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.* FROM access_locker INNER JOIN addlocker_request ON addlocker_request.id=(SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer WHERE users.username=?) WHERE access_locker.permission=1");
+        
+        stmt.setString(1,username);
+        
+        
+        ResultSet rs = stmt.executeQuery();
+        
+//        if(rs.next()){
+//            approvals.put("access_id", rs.getInt("locker_id"));
+//            approvals.put("date", rs.getString("date"));
+//        }
+        JSONArray jsonList = new JSONArray();
+
+        while(rs.next()){
+            JSONObject approvals = new JSONObject();
+            approvals.put("access_id", rs.getInt("id"));
+            approvals.put("date", rs.getString("date"));
+//            jsonList.put(approvals);
+            jsonList.add(approvals);
+        }
+        
+        System.out.println("======================================================"+jsonList);
+        
+        JSONObject data=new JSONObject();
+        data.put("approvals", jsonList);
+        
+        System.out.println("======================================================"+data);
+        
+        return data;
+//        return (JSONObject) new JSONObject().put("approvals", jsonList);
+        
+        
+    }
     /**
      * @return the id
      */
@@ -194,4 +298,6 @@ public class Bank {
     public void setCancellation_date(Date cancellation_date) {
         this.cancellation_date = cancellation_date;
     }
+
+    
 }

@@ -33,17 +33,29 @@
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
     <table class="table table-hover">
       <tr>
+        <th class="text-center" style="font-size:25px">
+          Locker access logs:
+        </th>
+
+      </tr>
+      <tr [ngStyle]="{'display':hide_blank}">
         <td>
            No records
         </td>
       </tr>
+      <tr *ngFor="let data of records; let i=index;">
+        <td>
+          {{i+1}}. You had accessed your locker on {{data.date}}. Your access id was {{data.access_id}}.
+        </td>
+        
+      </tr>
 
     </table>
 
-    <label [ngStyle]="{'display': lockeraccesspending_message}"></label>
+    <label [ngStyle]="{'display': lockeraccesspending_message}">Your locker access appointment is pending.<br> You access id is {{access_id}}</label>
     <form (ngSubmit)="accessrequest()" class="form-inline"  #request="ngForm" name="request" id="request" method="post" role="form" [ngStyle] = "{'display' : formHide}">
     <div ngModelGroup="requestData" #requestData="ngModelGroup">
-      <h3>Locker access appointment : </h3> 
+      <h3><label>Locker access appointment </label></h3> 
       <div class="form-group">
           <label>Date : &nbsp;</label>
           <input id="date" name="date" type="date" class="form-control" ngModel required>&nbsp;
