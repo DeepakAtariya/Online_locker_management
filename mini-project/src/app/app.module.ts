@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './main/main.component';
 
+
 const appRoutes : Routes = [
   {
     path : '', component : LoginComponent

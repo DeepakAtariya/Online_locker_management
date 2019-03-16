@@ -1,3 +1,7 @@
+<script>
+
+ </script>
+
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -23,3 +27,42 @@
       (Locker charges will be deducted on {{expiry_date}})
   </div>
 </div>
+
+<br>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+    <table class="table table-hover">
+      <tr>
+        <td>
+           No records
+        </td>
+      </tr>
+
+    </table>
+
+    <label [ngStyle]="{'display': lockeraccesspending_message}"></label>
+    <form (ngSubmit)="accessrequest()" class="form-inline"  #request="ngForm" name="request" id="request" method="post" role="form" [ngStyle] = "{'display' : formHide}">
+    <div ngModelGroup="requestData" #requestData="ngModelGroup">
+      <h3>Locker access appointment : </h3> 
+      <div class="form-group">
+          <label>Date : &nbsp;</label>
+          <input id="date" name="date" type="date" class="form-control" ngModel required>&nbsp;
+      </div>
+      <div class="form-group">
+          <label>Time : &nbsp;</label>
+          <input id="time" name="time" type="time" class="form-control" ngModel required>&nbsp;
+      </div>
+      <!-- <div class="form-group"> -->
+        <span style="color:red">{{warning}}</span>
+      <!-- </div> -->
+      <div class="form-group">
+          <input id="submit" name="submit" type="submit" value="Request" class="form-control">
+      </div>
+
+    </div>
+    </form>
+
+    
+  </div>
+</div>
+
