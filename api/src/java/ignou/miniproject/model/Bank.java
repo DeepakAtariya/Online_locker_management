@@ -142,21 +142,57 @@ public class Bank {
     
     public int addLockerAccessRequest(String username, String date, String time) throws SQLException {
         this.conn = Conn.getMysqlConnection();
-        PreparedStatement stmt=this.conn.prepareStatement("insert into access_locker (`locker_id`,`date`,`time`,`permission`) values((SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer where users.username=?),?,?,?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("insert into access_locker (`locker_id`,`date`,`time`,`permission`,`charges`) values((SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer where users.username=?),?,?,?,?) ");
         
         stmt.setString(1,username);
         stmt.setString(2,date);
         stmt.setString(3,time);
         stmt.setInt(4,0);
         
+        PreparedStatement countappointment=this.conn.prepareStatement("SELECT count(*) FROM access_locker INNER JOIN addlocker_request ON addlocker_request.id=(SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer WHERE users.username=?) WHERE access_locker.permission=1 ");
+        
+        countappointment.setString(1, username);
+        
+//        ResultSet rs = stmt.executeQuery();
+        ResultSet countResult = countappointment.executeQuery();
+        
+        if(countResult.next()){
+            int free_access = countResult.getInt(1);
+            if(free_access>12){
+                stmt.setInt(5,50);
+            }else{
+                stmt.setInt(5,0);
+            }   
+        }
         
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         stmt.setString(2,dateFormat.format(new Date()));
         
         int rs = stmt.executeUpdate();
         
-        return rs;
-
+        if(rs == 1){
+            // deduct money from account
+            PreparedStatement fetchCurrentBalance=this.conn.prepareStatement("Select balance from users username=?");
+            fetchCurrentBalance.setString(1, username);
+            ResultSet currentBalance = fetchCurrentBalance.executeQuery();
+            
+            int c_balance = 0;
+            if(currentBalance.next()){
+                c_balance = currentBalance.getInt("balance");
+                PreparedStatement deductLockerAccessFee=this.conn.prepareStatement("UPDATE users set balance=? where username=? ");
+                //charges = 200 per visit after 12 free access 
+                deductLockerAccessFee.setInt(1,(c_balance-200));
+                deductLockerAccessFee.setString(2, username);
+                
+                int balance_deducted = deductLockerAccessFee.executeUpdate();
+                
+                return balance_deducted;
+            }
+            
+        }else{
+            
+        }
+        return 0;
     }
     
     /**
@@ -213,6 +249,7 @@ public class Bank {
             JSONObject approvals = new JSONObject();
             approvals.put("access_id", rs.getInt("id"));
             approvals.put("date", rs.getString("date"));
+            approvals.put("charges",rs.getInt("charges"));
 //            jsonList.put(approvals);
             jsonList.add(approvals);
         }

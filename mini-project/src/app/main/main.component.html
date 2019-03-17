@@ -45,14 +45,14 @@
       </tr>
       <tr *ngFor="let data of records; let i=index;">
         <td>
-          {{i+1}}. You had accessed your locker on {{data.date}}. Your access id was {{data.access_id}}.
+          {{i+1}}. You had accessed your locker on {{data.date}}. Your access id was {{data.access_id+2019000}}. Access charge is {{data.charges}}
         </td>
         
       </tr>
 
     </table>
 
-    <label [ngStyle]="{'display': lockeraccesspending_message}">Your locker access appointment is pending.<br> You access id is {{access_id}}</label>
+    <label [ngStyle]="{'display': lockeraccesspending_message}">Your locker access appointment is pending.<br> Your access id is {{access_id+2019000}}</label>
     <form (ngSubmit)="accessrequest()" class="form-inline"  #request="ngForm" name="request" id="request" method="post" role="form" [ngStyle] = "{'display' : formHide}">
     <div ngModelGroup="requestData" #requestData="ngModelGroup">
       <h3><label>Locker access appointment </label></h3> 
