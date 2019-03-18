@@ -41,6 +41,7 @@ export class DashboardComponent implements OnInit {
     AppComponent.onShowLoader(0);
       console.log(response['status']);
       if(response['status'] == 4){
+        
         this.route.navigate(['\main']);
       }else if (response['status'] == 3){
         this.hideButton = "none";

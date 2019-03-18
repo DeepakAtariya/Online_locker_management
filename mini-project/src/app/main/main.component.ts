@@ -50,6 +50,25 @@ export class MainComponent implements OnInit {
     }else{
       
     }
+
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_request",this.user)
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response['status']);
+      if(response['status'] == 4){
+        
+        this.route.navigate(['\main']);
+      }else if (response['status'] == 3){
+        history.back();        
+      }
+      
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+      this.serverError = "Server Unavailable";
+    });
     
     
     //check the locker status and show old records of locker access request(if any) 
