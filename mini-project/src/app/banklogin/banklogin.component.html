@@ -4,7 +4,8 @@
 
     <!-- Icon -->
     <div class="fadeIn first">
-      <h4>Customer Login</h4>
+      <h4>Bank Login</h4>
+      <span style="color:red">{{warning}}</span>
       <!-- <img src="https://www.consumer-voice.org/wp-content/uploads/2017/09/bank-locker-insurance.jpg" id="icon" alt="User Icon" /> -->
     </div>
 
@@ -13,14 +14,9 @@
       <div ngModelGroup="loginFormData" #loginFormData = "ngModelGroup">
         <input type="text" id="login" class="fadeIn second" name="username" placeholder="login" ngModel required>
         <input type="password" id="password" class="fadeIn third" name="password" placeholder="password" ngModel required>
+        
         <input type="submit" class="fadeIn fourth" value="Log In">
       </div>
     </form>
-
-    <!-- Remind Passowrd -->
-    <!-- <div id="formFooter">
-      <a class="underlineHover" href="#">Forgot Password?</a>
-    </div> -->
-
   </div>
 </div>

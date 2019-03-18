@@ -10,6 +10,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './main/main.component';
+import { BankloginComponent } from './banklogin/banklogin.component';
+import { BankdashboardComponent } from './bankdashboard/bankdashboard.component';
 
 
 const appRoutes : Routes = [
@@ -21,9 +23,13 @@ const appRoutes : Routes = [
   },
   {
     path : '\main', component : MainComponent
+  },
+  {
+    path : 'bank', component : BankloginComponent
+  },
+  {
+    path : 'bankdashboard', component : BankdashboardComponent
   }
-
-
 ];
 
 @NgModule({
@@ -31,7 +37,9 @@ const appRoutes : Routes = [
     AppComponent,
     LoginComponent,
     DashboardComponent,
-    MainComponent
+    MainComponent,
+    BankloginComponent,
+    BankdashboardComponent
   ],
   imports: [
     BrowserModule,

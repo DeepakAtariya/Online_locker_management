@@ -24,12 +24,16 @@ export class DashboardComponent implements OnInit {
    
     this.user.username = localStorage.getItem("user");
     this.user.password = localStorage.getItem("key");
+    var role = localStorage.getItem("banker");
 
     if(this.user.username==null){
       this.route.navigate(['']);
     }else{
-      
+        if(role == 'banker'){
+          this.route.navigate(['/bankdashboard']);
+        }
     }
+
 
     AppComponent.onShowLoader(1);
     this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_request",this.user)

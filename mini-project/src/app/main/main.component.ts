@@ -51,6 +51,7 @@ export class MainComponent implements OnInit {
       
     }
     
+    
     //check the locker status and show old records of locker access request(if any) 
     AppComponent.onShowLoader(1);
       this.http.post("http://localhost:8080/api/miniproject/customer2bank/approvedlockerrequests",this.user)

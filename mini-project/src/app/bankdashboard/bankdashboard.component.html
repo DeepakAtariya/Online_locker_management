@@ -1,0 +1,46 @@
+
+<div class="container text-center">
+  <h4>Welcome Bank</h4>
+  
+</div>
+
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="bankdashboard">{{user.username}}</a>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+      <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> -->
+      <li><a href="bank" (click)="logout()"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+    </ul>
+  </div>
+</nav>
+<h5>You can see all the requests here and keep the track of available locker being used by customer</h5>
+
+<div class="container">
+<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#home">Locker Application Queue</a></li>
+  <li><a data-toggle="tab" href="#menu1">Occupied Locker</a></li>
+  <li><a data-toggle="tab" href="#menu2">Locker Appointments</a></li>
+</ul>
+
+<div class="tab-content">
+  <div id="home" class="tab-pane fade in active">
+    <h3>Locker Application Queue</h3>
+    <p>Locker application queue :  these people are waiting for free locker</p>
+  </div>
+  <div id="menu1" class="tab-pane fade">
+    <h3>Occupied Locker</h3>
+    <p>Locker are being used by customers</p>
+  </div>
+  <div id="menu2" class="tab-pane fade">
+    <h3>Locker Appointments </h3>
+    <p></p>
+  </div>
+  <div id="menu3" class="tab-pane fade">
+    <h3>Menu 3</h3>
+    <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+  </div>
+</div>
+</div>
