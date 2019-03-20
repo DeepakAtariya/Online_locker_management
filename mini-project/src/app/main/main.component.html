@@ -6,6 +6,7 @@
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="dashboard">Welcome {{user.username}}</a>
+      
     </div>
     <!-- <ul class="nav navbar-nav">
       <li class="active"><a href="#">Home</a></li>
@@ -21,6 +22,7 @@
 
 <div class="row information">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+      <label>locker ID - {{locker_id}}</label><br>
       <label>Locker Issue Date  : {{approved_date}}</label><br>
       <label>Locker Expiry Date : {{expiry_date}}</label><br>
       <label>Bank Balance : {{balance}} rupees</label><br>
@@ -39,9 +41,9 @@
 
       </tr>
       <tr [ngStyle]="{'display':hide_blank}">
-        <td>
+        <!-- <td> -->
            No records
-        </td>
+        <!-- </td> -->
       </tr>
       <tr *ngFor="let data of records; let i=index;">
         <td>

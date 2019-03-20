@@ -16,14 +16,38 @@ export class LoginComponent implements OnInit {
     "password":''
   };
 
+  user : any = {
+    "username" : "",
+    "password" : ""
+  }
+
   @ViewChild('login') loginData : NgForm;
 
   constructor(private http: HttpClient, private route:Router) { }
 
   ngOnInit() {
+
+    this.user.username = localStorage.getItem("user");
+    this.user.password = localStorage.getItem("key");
+    var role = localStorage.getItem("banker");
+
+    if(this.user.username==null){
+      this.route.navigate(['']);
+    }else{
+        if(role == 'banker'){
+          this.route.navigate(['/bankdashboard']);
+        }else{
+          console.log("not a banker but already logged in ");
+          this.route.navigate(['dashboard']);
+        }
+    }
+
   }
 
   onLogin(){
+
+    
+
     console.log("login hit");
 
     let loginData=this.loginData.value.loginFormData;

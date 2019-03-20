@@ -16,9 +16,11 @@
     </ul>
   </div>
 </nav>
-<h5>You can see all the requests here and keep the track of available locker being used by customer</h5>
 
-<div class="container">
+
+<div class="container text-center">
+    <h5>You can see all the requests here and keep the track of available locker being used by customer</h5>
+    <hr><br>
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#home">Locker Application Queue</a></li>
   <li><a data-toggle="tab" href="#menu1">Locker Availability</a></li>
@@ -29,25 +31,28 @@
   <div id="home" class="tab-pane fade in active">
     <h3>Locker Application Queue</h3>
     <p>Locker application queue :  these people are waiting for free locker</p>
+    <!-- {{test}} -->
 
-    <table class="table table-bordered">
+    <table class="table table-responsive table-bordered table-hover ">
       <thead>
         <tr>
           <th>S.no</th>
+          <th>Locker Application Id</th>
           <th>Customer name</th>
-          <th>Request on</th>
-          <th>Approved on</th>
-          <th>Expired on</th>
+          <th>Requested on</th>
           <th>Operations</th>
         </tr>
       </thead>
       <tbody>
-        <td>1</td>
-        <td></td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
+        <tr *ngFor="let data of records; let i=index;">
+            <td>{{i+1}}</td>
+            <td>{{data.locker_application_id}}</td>
+            <td>{{data.username}}</td>
+            <td>{{data.requested_date}}</td>
+            <td>
+              <button class="btn btn-success" (click)="approve(data.customer_id)">Approve</button>
+            </td>
+          </tr>
       </tbody>
 
     </table>

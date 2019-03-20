@@ -36,6 +36,7 @@ export class MainComponent implements OnInit {
   access_id : any;
   records : any;
   hide_blank : string;
+  locker_id: any;
 
   constructor(private route:Router, private http:HttpClient) { }
   @ViewChild('request') requestdata : NgForm;
@@ -57,7 +58,10 @@ export class MainComponent implements OnInit {
     AppComponent.onShowLoader(0);
       console.log(response['status']);
       if(response['status'] == 4){
-        
+          this.locker_id = response['locker_id'];
+          this.balance = response['balance'];
+          this.approved_date = response['issued_on'];
+          this.expiry_date = response['expired_on'];
         this.route.navigate(['\main']);
       }else if (response['status'] == 3){
         history.back();        
@@ -78,8 +82,14 @@ export class MainComponent implements OnInit {
         
         console.log(response);
 
-        this.records = response['approvals'];
-        this.hide_blank = "none";
+        if(response['approvals']!=""){
+          this.records = response['approvals'];
+          this.hide_blank = "none";
+        }else{
+          this.hide_blank = "block";
+        }
+
+        
         
         AppComponent.onShowLoader(0);
       },

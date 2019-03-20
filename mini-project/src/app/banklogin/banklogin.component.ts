@@ -32,7 +32,7 @@ export class BankloginComponent implements OnInit {
     this.http.post("http://localhost:8080/api/miniproject/login/bankauth",loginData)
     .subscribe((data)=>{
       AppComponent.onShowLoader(0);
-        console.log(data);
+        // console.log(data);
         if(data['role']=="banker"){
           localStorage.setItem("user",loginData.username);
           localStorage.setItem("key",loginData.password);
