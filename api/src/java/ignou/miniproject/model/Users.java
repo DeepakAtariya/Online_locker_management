@@ -43,6 +43,22 @@ public class Users {
         
         return rs.next();
     }
+
+    public Boolean bankauth(String username, String password) throws SQLException{
+        this.username = username;
+        this.password = password;
+        
+        this.conn = Conn.getMysqlConnection();
+        PreparedStatement stmt=this.conn.prepareStatement("select * from users where nature=? and username=? and password=?");
+        stmt.setString(1,"banker");
+        stmt.setString(2,username);
+        stmt.setString(3,password);
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        return rs.next();
+    }
+
     
     public String getUsername() {
         return username;

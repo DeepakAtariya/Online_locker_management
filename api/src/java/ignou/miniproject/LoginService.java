@@ -63,6 +63,33 @@ public class LoginService {
         result_json.put("auth", result);
         return Response.status(200).entity(result_json.toString()).build();
     }
+ 
+    @POST
+    @Path("/bankauth")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response bankLogin( String login_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(login_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        Boolean result = this.users.bankauth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            result_json.put("role", "banker");
+        return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("role", "customer");
+        return Response.status(200).entity(result_json.toString()).build();
+        }
+        
+        
+        
+    }
     
     /*
     @GET

@@ -36,7 +36,7 @@ public class Bank {
     public int locker_request(String username) throws SQLException {
         
         this.conn = Conn.getMysqlConnection();
-        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`,`expiry_date`) values((SELECT id FROM users where username=?),?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`) values((SELECT id FROM users where username=?),?) ");
         
         stmt.setString(1,username);
         
@@ -53,7 +53,7 @@ public class Bank {
 //        
 //
 //        stmt.setString(3,dateFormat.format(expiryDate));
-//        
+ 
         int rs = stmt.executeUpdate();
         
         return rs;
@@ -266,6 +266,124 @@ public class Bank {
         
         
     }
+    
+public JSONObject allTheLockerRequest() throws SQLException {
+    
+        System.out.println("======================================================check");
+    
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT users.id, users.username, addlocker_request.* from addlocker_request INNER JOIN users on users.id=addlocker_request.customer where approved_date IS NULL");
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        JSONArray jsonList = new JSONArray();
+
+        while(rs.next()){
+            JSONObject approvals = new JSONObject();
+            approvals.put("locker_application_id", rs.getInt("addlocker_request.id"));
+            approvals.put("username", rs.getString("username"));
+            approvals.put("requested_date",rs.getString("request_date"));
+            approvals.put("customer_id",rs.getInt("users.id"));
+//            jsonList.put(approvals);
+            jsonList.add(approvals);
+        }
+        
+        System.out.println("======================================================"+jsonList);
+        
+        JSONObject data=new JSONObject();
+        data.put("approvals", jsonList);
+        
+        System.out.println("======================================================"+data);
+        
+        return data;   
+    }
+
+    public Boolean updateLockerTable(int customer_id) throws SQLException {
+        System.out.println("************************************** "+customer_id);
+        
+    
+        this.conn = Conn.getMysqlConnection();
+        int l_id = 0;
+        
+        //get the id of unused locker 
+        PreparedStatement free_locker_id=this.conn.prepareStatement("SELECT id FROM `locker` WHERE customer is null limit 1");
+        
+        ResultSet rs = free_locker_id.executeQuery();
+        
+        if(rs.next()){
+             l_id = rs.getInt("id");
+        }
+        
+         System.out.println("************************free locke id******** "+l_id);
+        
+//        rs.close();
+        
+        
+        PreparedStatement stmt=this.conn.prepareStatement("UPDATE `locker` SET `customer` = ?, `available`='no' WHERE `locker`.`id` = ?");
+        
+        stmt.setInt(1, customer_id);
+        stmt.setInt(2, l_id);
+        
+        int rs_updation = stmt.executeUpdate();
+        
+//        stmt.close();
+        return rs_updation==1;
+  
+    }
+    
+    public Boolean updatedAddLockerRequestTable(int customer_id) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("UPDATE `addlocker_request` SET `approved_date` = ? , `expiry_date` = ? WHERE `addlocker_request`.`customer` = ?;");
+        
+        
+        
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        c.add(Calendar.YEAR, 1);
+        Date newDate = c.getTime();
+        
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        stmt.setString(1, dateFormat.format(new Date()));
+        stmt.setString(2,dateFormat.format(newDate));
+        stmt.setInt(3, customer_id);
+        
+        int rs = stmt.executeUpdate();
+        
+        return rs==1;
+    }
+    
+    public ArrayList getLockerDetails(String username) throws SQLException {
+        
+        //get requested date - addlocker_request
+        //get expired date - addlocker_request
+        // balance - users
+        // locker id - locker
+        
+        this.conn = Conn.getMysqlConnection();
+        int l_id = 0;
+        
+        //get the id of unused locker 
+        PreparedStatement locker_info=this.conn.prepareStatement("SELECT users.balance, locker.id, addlocker_request.approved_date, addlocker_request.expiry_date from addlocker_request inner join users on users.id=addlocker_request.customer inner join locker on users.id=locker.customer where users.username=?");
+        
+        locker_info.setString(1, username);
+        
+        
+        ResultSet rs = locker_info.executeQuery();
+        
+        ArrayList locker_details = new ArrayList();
+        
+        if(rs.next()){
+            locker_details.add(rs.getInt("balance"));
+            locker_details.add(rs.getInt("id"));
+            locker_details.add(rs.getInt("approved_date"));
+            locker_details.add(rs.getInt("expiry_date"));
+        }
+        
+        return locker_details;
+    }
+
     /**
      * @return the id
      */
@@ -335,6 +453,10 @@ public class Bank {
     public void setCancellation_date(Date cancellation_date) {
         this.cancellation_date = cancellation_date;
     }
+
+
+
+
 
     
 }
