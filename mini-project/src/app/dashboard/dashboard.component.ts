@@ -36,16 +36,22 @@ export class DashboardComponent implements OnInit {
 
 
     AppComponent.onShowLoader(1);
-    this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_request",this.user)
+    this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_approval",this.user)
     .subscribe(response=>{
     AppComponent.onShowLoader(0);
       console.log(response['status']);
       if(response['status'] == 4){
-        
         this.route.navigate(['\main']);
       }else if (response['status'] == 3){
         this.hideButton = "none";
         this.messageVisibility = "block";
+      }else if(response['status']==5){
+          localStorage.clear();
+          alert("your locker account is cancelled, please contact your bank");
+          this.route.navigate(['']);
+      }else{
+        this.hideButton="block";
+        this.messageVisibility = "none";
       }
       
     },

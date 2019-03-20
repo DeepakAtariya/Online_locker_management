@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 export class BankdashboardComponent implements OnInit {
   records: any;
   test: string;
+  availableLocker: any;
 
   constructor(private route:Router, private http:HttpClient) { }
 
@@ -39,6 +40,24 @@ export class BankdashboardComponent implements OnInit {
     AppComponent.onShowLoader(0);
       console.log(response);
       this.records = response['approvals'];
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+
+
+    //Locker Availability 
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/bank/overalllocker",{
+      "username" : this.user.username,
+      "password" : this.user.password,
+    })
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response);
+      this.availableLocker = response['locker_info'];  
+      
     },
     error=>{
       AppComponent.onShowLoader(0);
@@ -81,6 +100,59 @@ export class BankdashboardComponent implements OnInit {
     });
 
 
+  }
+
+  cancel(data:any){
+    console.log(data);
+
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/bank/cancel_locker_application",{
+      "username" : this.user.username,
+      "password" : this.user.password,
+      "customer_id" : data
+    })
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response);
+      this.availableLocker = response['locker_info'];  
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+  }
+
+  refreshQueue(){
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/bank/queue",this.user)
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response);
+      this.records = response['approvals'];
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+  }
+
+  refreshLocker(){
+    //Locker Availability 
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/bank/overalllocker",{
+      "username" : this.user.username,
+      "password" : this.user.password,
+    })
+    .subscribe(response=>{
+    AppComponent.onShowLoader(0);
+      console.log(response);
+      this.availableLocker = response['locker_info'];  
+      
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
   }
 
 

@@ -22,9 +22,9 @@
     <h5>You can see all the requests here and keep the track of available locker being used by customer</h5>
     <hr><br>
 <ul class="nav nav-tabs">
-  <li class="active"><a data-toggle="tab" href="#home">Locker Application Queue</a></li>
-  <li><a data-toggle="tab" href="#menu1">Locker Availability</a></li>
-  <li><a data-toggle="tab" href="#menu2">Locker Appointments</a></li>
+  <li class="active"><a data-toggle="tab" href="#home" (click)="refreshQueue()">Locker Application Queue</a></li>
+  <li><a data-toggle="tab" href="#menu1" (click)="refreshLocker()">Locker Availability</a></li>
+  <li><a data-toggle="tab" href="#menu2" (click)="refreshAppointment()">Locker Appointments</a></li>
 </ul>
 
 <div class="tab-content">
@@ -59,8 +59,44 @@
 
   </div>
   <div id="menu1" class="tab-pane fade">
-    <h3>Occupied Locker</h3>
+    <h3>Available Locker</h3>
     <p>Locker are being used by customers</p>
+    <table class="table table-responsive table-bordered table-hover ">
+        <thead>
+          <tr>
+            <th>S.no</th>
+            <th>Locker ID</th>
+            <th>Assigned to (Account Number)</th>
+            <th>Availability</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of availableLocker; let i=index;">
+              <td *ngIf="!data.account_number == false; else s">{{i+1}}</td>
+              <ng-template #s><td style="background-color:lightgreen">{{i+1}}</td></ng-template>
+
+              <td *ngIf="!data.account_number == false; else id">{{data.locker_id}}</td>
+              <ng-template #id><td style="background-color:lightgreen">{{data.locker_id}}</td></ng-template>
+
+              <td *ngIf="!data.account_number == false; else elseBlock">{{data.account_number}}
+                  
+              </td>
+              <ng-template #elseBlock><td style="background-color:lightgreen">Not Assigned Yet!</td></ng-template>
+              <td *ngIf="!data.account_number == false; else availability">{{data.availability}}</td>
+              <ng-template #availability><td style="background-color:lightgreen">{{data.availability}}</td></ng-template>
+
+
+              
+              <td *ngIf="!data.account_number == false else elsecancel">
+                <button class="btn btn-danger" (click)="cancel(data.account_number)">Cancel</button>
+              </td>
+            <ng-template #elsecancel><td style="background-color:lightgreen"></td></ng-template>
+            </tr>
+        </tbody>
+  
+      </table>
+  
   </div>
   <div id="menu2" class="tab-pane fade">
     <h3>Locker Appointments </h3>
