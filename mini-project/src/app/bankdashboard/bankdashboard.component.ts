@@ -12,6 +12,7 @@ export class BankdashboardComponent implements OnInit {
   records: any;
   test: string;
   availableLocker: any;
+  appointments: any;
 
   constructor(private route:Router, private http:HttpClient) { }
 
@@ -19,34 +20,45 @@ export class BankdashboardComponent implements OnInit {
     "username" : "",
     "password" : ""
   }
-
+  
   ngOnInit() {
-
+    
     this.test = "hey hey ngOnInit"; 
     this.user.username = localStorage.getItem("user");
     this.user.password = localStorage.getItem("key");
-
+    
     if(this.user.username==null){
       this.route.navigate(['']);
     }else{
       
-    }
-
-    // console.log(this.user);
-
-    AppComponent.onShowLoader(1);
-    this.http.post("http://localhost:8080/api/miniproject/bank/queue",this.user)
-    .subscribe(response=>{
-    AppComponent.onShowLoader(0);
-      console.log(response);
-      this.records = response['approvals'];
-    },
-    error=>{
-      AppComponent.onShowLoader(0);
-      console.log(error);
-    });
-
-
+      //locker appointments
+      AppComponent.onShowLoader(1);
+      this.http.post("http://localhost:8080/api/miniproject/bank/appointments",this.user)
+      .subscribe(response=>{
+        AppComponent.onShowLoader(0);
+        console.log(response);
+        this.appointments = response['appointments'];
+      },
+      error=>{
+        AppComponent.onShowLoader(0);
+        console.log(error);
+      });
+      
+      
+      // locker application queue
+      AppComponent.onShowLoader(1);
+      this.http.post("http://localhost:8080/api/miniproject/bank/queue",this.user)
+      .subscribe(response=>{
+        AppComponent.onShowLoader(0);
+        console.log(response);
+        this.records = response['approvals'];
+      },
+      error=>{
+        AppComponent.onShowLoader(0);
+        console.log(error);
+      });
+  
+  
     //Locker Availability 
     AppComponent.onShowLoader(1);
     this.http.post("http://localhost:8080/api/miniproject/bank/overalllocker",{
@@ -54,23 +66,23 @@ export class BankdashboardComponent implements OnInit {
       "password" : this.user.password,
     })
     .subscribe(response=>{
-    AppComponent.onShowLoader(0);
+      AppComponent.onShowLoader(0);
       console.log(response);
-      this.availableLocker = response['locker_info'];  
-      
+      this.availableLocker = response['locker_info'];      
     },
     error=>{
       AppComponent.onShowLoader(0);
       console.log(error);
     });
-
-
+  
   }
+}
 
-  logout(){
-    localStorage.clear();
-    this.route.navigate(['/bank']);
-  }
+logout(){
+  localStorage.clear();
+  this.route.navigate(['bank']);
+}
+
 
   approve(data:any){
     console.log(data);
@@ -155,5 +167,61 @@ export class BankdashboardComponent implements OnInit {
     });
   }
 
+  refreshAppointment(){
+    console.log("appointment section is refreshed");
+      //locker appointments
+      AppComponent.onShowLoader(1);
+      this.http.post("http://localhost:8080/api/miniproject/bank/appointments",this.user)
+      .subscribe(response=>{
+        AppComponent.onShowLoader(0);
+        console.log(response);
+        this.appointments = response['appointments'];
+      },
+      error=>{
+        AppComponent.onShowLoader(0);
+        console.log(error);
+      });
 
+  }
+
+  approveAppointment(access_id : any){
+
+
+    //approve locker appointments
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/bank/approveAppointment",{
+      "username":this.user.username,
+      "password":this.user.password,
+      "access_id":access_id
+    })
+    .subscribe(response=>{
+      AppComponent.onShowLoader(0);
+      console.log(response);
+      this.appointments = response['appointments'];
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+  }
+
+  rejectAppointment(access_id : any ){
+
+    //reject locker appointments
+    AppComponent.onShowLoader(1);
+    this.http.post("http://localhost:8080/api/miniproject/bank/rejectAppointment",{
+      "username":this.user.username,
+      "password":this.user.password,
+      "access_id":access_id
+    })
+    .subscribe(response=>{
+      AppComponent.onShowLoader(0);
+      console.log(response);
+      this.appointments = response['appointments'];
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+  }
 }

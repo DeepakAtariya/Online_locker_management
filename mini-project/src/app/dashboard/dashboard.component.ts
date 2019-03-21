@@ -50,8 +50,8 @@ export class DashboardComponent implements OnInit {
           alert("your locker account is cancelled, please contact your bank");
           this.route.navigate(['']);
       }else{
-        this.hideButton="block";
-        this.messageVisibility = "none";
+        // this.hideButton="block";
+        // this.messageVisibility = "none";
       }
       
     },

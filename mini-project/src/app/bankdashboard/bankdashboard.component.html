@@ -12,7 +12,7 @@
     </div>
     <ul class="nav navbar-nav navbar-right">
       <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> -->
-      <li><a href="bank" (click)="logout()"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      <li><button class="btn btn-link" (click)="logout()"><span class="glyphicon glyphicon-log-in"></span> Logout</button></li>
     </ul>
   </div>
 </nav>
@@ -38,21 +38,21 @@
         <tr>
           <th>S.no</th>
           <th>Locker Application Id</th>
-          <th>Customer name</th>
+          <th>Account Number</th>
           <th>Requested on</th>
           <th>Operations</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let data of records; let i=index;">
-            <td>{{i+1}}</td>
-            <td>{{data.locker_application_id}}</td>
-            <td>{{data.username}}</td>
-            <td>{{data.requested_date}}</td>
-            <td>
-              <button class="btn btn-success" (click)="approve(data.customer_id)">Approve</button>
-            </td>
-          </tr>
+          <td>{{i+1}}</td>
+          <td>{{data.locker_application_id}}</td>
+          <td>{{data.customer_id}}</td>
+          <td>{{data.requested_date}}</td>
+          <td>
+            <button class="btn btn-success" (click)="approve(data.customer_id)">Approve</button>
+          </td>
+        </tr>
       </tbody>
 
     </table>
@@ -100,11 +100,40 @@
   </div>
   <div id="menu2" class="tab-pane fade">
     <h3>Locker Appointments </h3>
-    <p></p>
-  </div>
-  <div id="menu3" class="tab-pane fade">
-    <h3>Menu 3</h3>
-    <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+    <p>You can approve or reject </p>
+
+    <table class="table table-responsive table-bordered table-hover ">
+        <thead>
+          <tr>
+            <th>S.no</th>
+            <th>Locker ID</th>
+            <th>Access ID</th>
+            <th>Account</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Charges</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of appointments; let i=index;">
+            <td>{{i+1}}</td>
+            <td>{{data.locker_id}}</td>
+            <td>{{data.access_id}}</td>
+            <td>{{data.account}}</td>
+            <td>{{data.date}}</td>
+            <td>{{data.time}}</td>
+            <td>{{data.charges}}</td>
+            <td>
+              <div class="btn-group">
+                  <button class="btn btn-success" (click)="approveAppointment(data.access_id)">Approve</button>
+                  <button class="btn btn-danger" (click)="rejectAppointment(data.access_id)">Reject</button>
+              </div>
+            </td>
+          </tr>
+            
+        </tbody>
+      </table>
   </div>
 </div>
 </div>

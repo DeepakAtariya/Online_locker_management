@@ -79,7 +79,7 @@ export class MainComponent implements OnInit {
           this.balance = response['balance'];
           this.approved_date = response['issued_on'];
           this.expiry_date = response['expired_on'];
-        this.route.navigate(['\main']);
+        // this.route.navigate(['\main']);
       }else if (response['status'] == 3){
         history.back();        
       }
@@ -105,9 +105,6 @@ export class MainComponent implements OnInit {
         }else{
           this.hide_blank = "block";
         }
-
-        
-        
         AppComponent.onShowLoader(0);
       },
       error=>{
@@ -129,8 +126,15 @@ export class MainComponent implements OnInit {
           this.formHide = "none";
           this.lockeraccesspending_message ="block";
         }else{
-          this.formHide = "block";
-          this.lockeraccesspending_message ="none";
+          if(response['is_rejected']==1){
+            alert("Your last locker access request is rejected");
+            this.formHide = "block";
+            this.lockeraccesspending_message ="none";
+          }else{
+            this.formHide = "block";
+            this.lockeraccesspending_message ="none";
+          }
+          
         }
       },
       error=>{
@@ -176,13 +180,14 @@ export class MainComponent implements OnInit {
 
   logout(){
     localStorage.clear();
-    history.go(-2);
+    // history.go(-2);
+    this.route.navigate(['']);
   }
 
 
   // locker appointment
   accessrequest(){
-    // console.log(this.requestdata.value.requestData);
+    console.log(this.requestdata.value.requestData);
     this.request_data.Date = this.requestdata.value.requestData.date;
     this.request_data.Time = this.requestdata.value.requestData.time;
     this.request_data.username = this.user.username;
@@ -221,10 +226,7 @@ export class MainComponent implements OnInit {
       });
     }
 
-    // console.log(this.request_data);
-    // this.route.navigate(['\main']);
     history.go(0);
+
   }
-
-
 }
