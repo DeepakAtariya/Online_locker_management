@@ -261,7 +261,7 @@ public class CustomerService {
         String username = (String) json.get("username");
         String password = (String) json.get("password");
         
-        // pass the username and password for authentication from database
+        // pass the username and password for authen-tication from database
         this.users = new Users();
         
         this.bank = new Bank();
