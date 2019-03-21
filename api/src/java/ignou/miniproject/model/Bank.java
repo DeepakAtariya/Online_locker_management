@@ -65,6 +65,8 @@ public class Bank {
 //        PreparedStatement stmt=this.conn.prepareStatement("insert into addlocker_request (`customer`, `request_date`) values((SELECT id FROM users where username=?),?) ");
         PreparedStatement stmt=this.conn.prepareStatement("SELECT * FROM addlocker_request where customer = (SELECT id FROM users where username=?)");
         
+        
+        
         stmt.setString(1,username);
         
         
@@ -75,7 +77,11 @@ public class Bank {
             if(request_date!=null){
                 
                 Date approved_date = rs.getDate("approved_date");
-                if(approved_date!=null){
+                Date cancelled_date = rs.getDate("cancelled_date");
+                if(cancelled_date!=null){
+                    return 5;
+                }
+                else if(approved_date!=null){
                     return 4;
                 }else{
                     return 3;
@@ -142,14 +148,14 @@ public class Bank {
     
     public int addLockerAccessRequest(String username, String date, String time) throws SQLException {
         this.conn = Conn.getMysqlConnection();
-        PreparedStatement stmt=this.conn.prepareStatement("insert into access_locker (`locker_id`,`date`,`time`,`permission`,`charges`) values((SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer where users.username=?),?,?,?,?) ");
+        PreparedStatement stmt=this.conn.prepareStatement("insert into access_locker (`locker_id`,`date`,`time`,`permission`,`charges`) values((SELECT locker.id FROM locker INNER JOIN users ON users.id=locker.customer where users.username=?),?,?,?,?) ");
         
         stmt.setString(1,username);
         stmt.setString(2,date);
         stmt.setString(3,time);
         stmt.setInt(4,0);
         
-        PreparedStatement countappointment=this.conn.prepareStatement("SELECT count(*) FROM access_locker INNER JOIN addlocker_request ON addlocker_request.id=(SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer WHERE users.username=?) WHERE access_locker.permission=1 ");
+        PreparedStatement countappointment=this.conn.prepareStatement("SELECT count(*) FROM access_locker INNER JOIN locker ON locker.id=access_locker.locker_id inner join users on users.id=locker.customer WHERE access_locker.permission=1 and users.username = ? ");
         
         countappointment.setString(1, username);
         
@@ -165,14 +171,14 @@ public class Bank {
             }   
         }
         
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        stmt.setString(2,dateFormat.format(new Date()));
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+//        stmt.setString(2,dateFormat.format(new Date()));
         
         int rs = stmt.executeUpdate();
         
         if(rs == 1){
             // deduct money from account
-            PreparedStatement fetchCurrentBalance=this.conn.prepareStatement("Select balance from users username=?");
+            PreparedStatement fetchCurrentBalance=this.conn.prepareStatement("Select balance from users where username=?");
             fetchCurrentBalance.setString(1, username);
             ResultSet currentBalance = fetchCurrentBalance.executeQuery();
             
@@ -204,7 +210,7 @@ public class Bank {
         
         this.conn = Conn.getMysqlConnection();
         
-        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.id FROM access_locker INNER JOIN addlocker_request ON addlocker_request.id=(SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer WHERE users.username=?) WHERE access_locker.permission=0");
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.id FROM access_locker INNER JOIN locker ON locker.id=access_locker.locker_id inner join users on users.id=locker.customer WHERE access_locker.permission=0 and users.username=?");
         
         stmt.setString(1,username);
         
@@ -223,6 +229,29 @@ public class Bank {
         
     }
     
+    public int checkRejectedLockerAccessRequest(String username) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.id FROM access_locker INNER JOIN locker ON locker.id=access_locker.locker_id inner join users on users.id=locker.customer WHERE access_locker.permission=2 and users.username=?");
+        
+        stmt.setString(1,username);
+        
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next()){
+            
+            int access_id = rs.getInt("id");
+//            return access_id;
+               return 1;
+            
+        }
+        
+        return 0;
+
+    }
+
+    
     /**
      * checkPendingLockerAccessRequest : this method checks for pending request and return 'access id' of that request
      */
@@ -232,9 +261,10 @@ public class Bank {
         
         this.conn = Conn.getMysqlConnection();
         
-        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.* FROM access_locker INNER JOIN addlocker_request ON addlocker_request.id=(SELECT addlocker_request.id FROM addlocker_request INNER JOIN users ON users.id=addlocker_request.customer WHERE users.username=?) WHERE access_locker.permission=1");
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT access_locker.* FROM access_locker INNER JOIN locker ON locker.id=access_locker.locker_id inner join users on users.id=locker.customer WHERE access_locker.permission=1 and users.username=?");
         
         stmt.setString(1,username);
+//        stmt.setString(2,username);
         
         
         ResultSet rs = stmt.executeQuery();
@@ -315,7 +345,7 @@ public JSONObject allTheLockerRequest() throws SQLException {
              l_id = rs.getInt("id");
         }
         
-         System.out.println("************************free locke id******** "+l_id);
+         System.out.println("************************free lock id******** "+l_id);
         
 //        rs.close();
         
@@ -383,7 +413,111 @@ public JSONObject allTheLockerRequest() throws SQLException {
         
         return locker_details;
     }
+    
+    
+    public JSONObject allLockerTableData() throws SQLException {
+        
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT * from locker");
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        JSONArray jsonList = new JSONArray();
 
+        while(rs.next()){
+            JSONObject approvals = new JSONObject();
+            approvals.put("locker_id", rs.getInt("id"));
+            approvals.put("account_number", rs.getString("customer")==null?false:rs.getString("customer"));
+            approvals.put("availability",rs.getString("available"));
+//            approvals.put("customer_id",rs.getInt("users.id"));
+//            jsonList.put(approvals);
+            jsonList.add(approvals);
+        }
+        
+        System.out.println("======================================================"+jsonList);
+        
+        JSONObject data=new JSONObject();
+        data.put("locker_info", jsonList);
+        
+        System.out.println("======================================================"+data);
+        
+        return data;
+    }
+    
+    public Boolean removeCustomerId(int customer_id) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        PreparedStatement stmt=this.conn.prepareStatement("UPDATE `locker` SET `customer` = NULL, `available`='yes' WHERE `locker`.`customer` = ?;");
+        stmt.setInt(1, customer_id);
+        int rs = stmt.executeUpdate();
+        return rs==1;
+    }
+ 
+    public Boolean insertCancellationDataIntoAddLocker_requestTable(int customer_id) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        PreparedStatement stmt=this.conn.prepareStatement("UPDATE `addlocker_request` SET `cancelled_date` = ? WHERE `addlocker_request`.`customer` = ?;");
+        stmt.setString(1, new SimpleDateFormat("yyyy/MM/dd").format(new Date()));
+        stmt.setInt(2, customer_id);
+        int rs = stmt.executeUpdate();
+        return rs==1;
+    }
+
+    public JSONObject allAppointments() throws SQLException {   
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT users.*, access_locker.* from access_locker INNER JOIN locker on locker.id=access_locker.locker_id inner join users on users.id=locker.customer where access_locker.permission=0");
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        JSONArray jsonList = new JSONArray();
+
+        while(rs.next()){
+            JSONObject approvals = new JSONObject();
+            approvals.put("access_id", rs.getInt("access_locker.id"));
+            approvals.put("locker_id", rs.getInt("access_locker.locker_id"));
+            approvals.put("account", rs.getInt("users.id"));
+            approvals.put("date",rs.getString("access_locker.date"));
+            approvals.put("time",rs.getString("access_locker.time"));
+            approvals.put("charges",rs.getString("access_locker.charges"));
+            jsonList.add(approvals);
+        }
+        
+        JSONObject data=new JSONObject();
+        data.put("appointments", jsonList);
+       
+        return data;   
+    }
+    
+    public Boolean setPermission2One(int access_id) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("UPDATE `access_locker` SET `permission` = 1 WHERE `access_locker`.`id` = ?");
+        
+        stmt.setInt(1, access_id);
+        
+        int rs_updation = stmt.executeUpdate();
+        
+        return rs_updation==1;
+        
+        
+    }
+
+    public Boolean rejectAppointment(int access_id) throws SQLException {
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("UPDATE `access_locker` SET `permission` = 2 WHERE `access_locker`.`id` = ?");
+        
+        stmt.setInt(1, access_id);
+        
+        int rs_updation = stmt.executeUpdate();
+        
+        return rs_updation==1;
+        
+      
+    }
+
+
+    
     /**
      * @return the id
      */
@@ -453,6 +587,8 @@ public JSONObject allTheLockerRequest() throws SQLException {
     public void setCancellation_date(Date cancellation_date) {
         this.cancellation_date = cancellation_date;
     }
+
+
 
 
 

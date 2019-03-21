@@ -101,6 +101,44 @@ public class CustomerService {
         
         
     }
+
+
+    @POST
+    @Path("/check_locker_approval")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response check_locker_Approval( String login_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(login_json);
+        String username = (String) json.get("username");
+        String password = (String) json.get("password");
+//        
+        // pass the username and password for authentication from database
+        this.users = new Users();
+        this.bank = new Bank();
+        Boolean result = this.users.auth(username, password);
+        JSONObject result_json = new JSONObject();
+        
+        if(result){
+            
+            //insert user into addlocker_request with dates
+            int is_requested;
+            is_requested = this.bank.check_locker_request(username);
+        
+            result_json.put("status", is_requested);
+            return Response.status(200).entity(result_json.toString()).build();
+        }else{
+            result_json.put("status", result);
+            return Response.status(200).entity(result_json.toString()).build();
+        }
+
+//        return Response.status(200)
+//                .entity((login_json))
+//                .build();
+        
+        
+    }
+
     
     @POST
     @Path("/balance")
@@ -235,9 +273,12 @@ public class CustomerService {
             //insert user into addlocker_request with dates
             int locker_access_id;
             locker_access_id = this.bank.checkPendingLockerAccessRequest(username);
+            int is_rejected;
+            is_rejected = this.bank.checkRejectedLockerAccessRequest(username);
             
             // if locker_access_id is 0 then no pending request is there
             result_json.put("LockerAccessId", locker_access_id);
+            result_json.put("is_rejected", is_rejected);
             return Response.status(200).entity(result_json.toString()).build();
         }else{
             result_json.put("status", result);
