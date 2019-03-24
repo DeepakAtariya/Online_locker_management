@@ -13,6 +13,7 @@ export class BankdashboardComponent implements OnInit {
   test: string;
   availableLocker: any;
   appointments: any;
+  accounts : any;
 
   constructor(private route:Router, private http:HttpClient) { }
 
@@ -69,6 +70,19 @@ export class BankdashboardComponent implements OnInit {
       AppComponent.onShowLoader(0);
       console.log(response);
       this.availableLocker = response['locker_info'];      
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+    
+    //currently active accounts
+    AppComponent.onShowLoader(1);
+    this.http.get("http://localhost:8080/api/miniproject/bank/active_accounts")
+    .subscribe(response=>{
+      AppComponent.onShowLoader(0);
+      console.log(response);
+      this.accounts = response['accounts'];      
     },
     error=>{
       AppComponent.onShowLoader(0);
@@ -218,6 +232,22 @@ logout(){
       AppComponent.onShowLoader(0);
       console.log(response);
       this.appointments = response['appointments'];
+    },
+    error=>{
+      AppComponent.onShowLoader(0);
+      console.log(error);
+    });
+  }
+
+  refreshAccounts(){
+
+    //reject locker appointments
+    AppComponent.onShowLoader(1);
+    this.http.get("http://localhost:8080/api/miniproject/bank/active_accounts")
+    .subscribe(response=>{
+      AppComponent.onShowLoader(0);
+      console.log(response);
+      this.accounts = response['accounts'];
     },
     error=>{
       AppComponent.onShowLoader(0);

@@ -74,4 +74,8 @@ export class LoginComponent implements OnInit {
 
   }
 
+  createAccount(){
+    this.route.navigate(['account']);
+  }
+
 }

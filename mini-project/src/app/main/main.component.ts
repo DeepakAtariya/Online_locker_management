@@ -53,25 +53,10 @@ export class MainComponent implements OnInit {
       
     }
 
-    // AppComponent.onShowLoader(1);
-    // this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_approval",this.user)
-    // .subscribe(response=>{
-    // AppComponent.onShowLoader(0);
-    //   if(response['status']==5){
-    //     alert("your locker account is cancelled, please contact your bank");
-    //     this.route.navigate(['']);
-    //   }
-    // },
-    // error=>{
-    //   AppComponent.onShowLoader(0);
-    //   console.log(error);
-    //   this.serverError = "Server Unavailable";
-    // });
-
-
     AppComponent.onShowLoader(1);
     this.http.post("http://localhost:8080/api/miniproject/customer2bank/check_locker_request",this.user)
     .subscribe(response=>{
+      console.log(response);
     AppComponent.onShowLoader(0);
       console.log(response['status']);
       if(response['status'] == 4){

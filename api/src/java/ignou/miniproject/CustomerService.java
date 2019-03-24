@@ -31,6 +31,32 @@ public class CustomerService {
     private Bank bank=null;
        
     @POST
+    @Path("/open_account")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response open_account( String login_json ) throws ParseException, SQLException {
+        
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(login_json);
+        String name = (String) json.get("name");
+        String contact = (String) json.get("contact");
+        String address = (String) json.get("address");
+        String openingamount =  Long.toString((Long)json.get("openingamount"));
+        String accounttype = (String) json.get("accounttype");
+        String password = (String) json.get("password");
+        JSONObject result_json = new JSONObject();
+
+        this.bank = new Bank();
+        
+        String account_number = this.bank.openAccount(name, contact, address, openingamount, accounttype, password);
+        
+        result_json.put("account_number", account_number);
+        
+        
+        return Response.status(200).entity(result_json.toString()).build();
+    }
+
+    
+    @POST
     @Path("/locker_request")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response locker_Request( String login_json ) throws ParseException, SQLException {
@@ -320,22 +346,5 @@ public class CustomerService {
         
     }
     
-
-//    @GET
-//    @Path("/test")
-//    @Produces(MediaType.TEXT_PLAIN)
-//    public Response getJSONData(){
-//        
-//        JSONObject json = new JSONObject();
-//        json.put("name",name);
-//        json.put("code","1010011");
-//        json.put("age",21);
-////        return String.valueOf(json);
-//        return Response.status(200)
-//            .entity("got")
-//            .build();
-//
-//    }
-
      
 }

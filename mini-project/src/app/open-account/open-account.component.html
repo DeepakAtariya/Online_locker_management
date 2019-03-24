@@ -1,0 +1,37 @@
+<div class="container">
+  <div class="row">
+
+    <h3 class="text-center">Account Opening Form</h3>
+    <hr>
+    
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <!-- Login Form -->
+    <form (ngSubmit)="onSubmit()" #account_open_details="ngForm" name="account_open_details" id="account_open_details" method="post" role="form" class="">
+      
+      <div ngModelGroup="account_open_data" #loginFormData = "ngModelGroup" class="form-group">
+          <label for="account_type">Customer Name : </label>
+        <input type="text" id="name" class="form-control" name="name" placeholder="Name" ngModel required>
+        <label for="account_type">Contact Number</label>
+        <input type="text" id="contact" class="form-control" name="contact" placeholder="Contact" ngModel required>
+        <label for="account_type">Residential Address</label>
+        <!-- <input type="textarea" rows="5" id="address" class="form-control"  > -->
+        <textarea class="form-control" rows="3" id="address" name="address" placeholder="Address" ngModel required></textarea>
+        
+        <label for="account_type">Account Type:</label>
+          <select class="form-control" id="accounttype" name="accounttype" ngModel required>
+            <option>Saving</option>
+          <option>Current</option>
+        </select>
+        
+        <label for="account_type">Opening Amount :</label>
+        <input type="number" id="openingamount" class="form-control" name="openingamount" placeholder="Opening Amount" ngModel required>
+        <label for="account_type">Password</label>
+        <input type="password" id="password" class="form-control" name="password" placeholder="password" ngModel required>
+        <span style="color:red">{{warning}}</span>
+        <br>
+        <input style="width:200px" type="submit" class="btn btn-success" value="Submit">
+      </div>
+    </form>
+    </div>
+  </div>
+</div>

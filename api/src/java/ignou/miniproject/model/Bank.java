@@ -343,6 +343,15 @@ public JSONObject allTheLockerRequest() throws SQLException {
         
         if(rs.next()){
              l_id = rs.getInt("id");
+             System.out.println("************************Deducting the money from user account******************** ");
+             
+             PreparedStatement deductMoney = this.conn.prepareStatement("UPDATE users as a INNER join users as b on a.id=b.id set a.balance = b.balance - 1520 WHERE a.id=?");
+             
+             deductMoney.setInt(1, customer_id);
+             
+             int money_deducted = deductMoney.executeUpdate();
+             
+             System.out.println("************************ Money Deducted ******************** "+money_deducted+" from "+customer_id);
         }
         
          System.out.println("************************free lock id******** "+l_id);
@@ -403,13 +412,15 @@ public JSONObject allTheLockerRequest() throws SQLException {
         ResultSet rs = locker_info.executeQuery();
         
         ArrayList locker_details = new ArrayList();
-        
+                                                                                                                                                                   
         if(rs.next()){
             locker_details.add(rs.getInt("balance"));
             locker_details.add(rs.getInt("id"));
-            locker_details.add(rs.getInt("approved_date"));
-            locker_details.add(rs.getInt("expiry_date"));
+            locker_details.add(rs.getDate("approved_date"));
+            locker_details.add(rs.getDate("expiry_date"));
         }
+        
+        System.out.println("Locker  ========================== "+locker_details);
         
         return locker_details;
     }
@@ -515,6 +526,82 @@ public JSONObject allTheLockerRequest() throws SQLException {
         
       
     }
+    
+    public String openAccount(String name, String contact, String address, String openingamount, String accounttype, String password) throws SQLException {
+        
+        System.out.print("==============================================="+address);
+                
+        this.conn = Conn.getMysqlConnection();
+        PreparedStatement stmt=this.conn.prepareStatement("insert into users (`username`,`password`,`nature`,`balance`,`name`,`contact`,`address`,`accounttype`,`is_active`) values(?,?,'customer',?,?,?,?,?,1)");
+     
+        stmt.setString(1,"");
+        stmt.setString(2,password);
+//        stmt.setInt(3,Integer.parseInt(openingamount));
+        stmt.setString(3, openingamount);
+        stmt.setString(4,name);
+        stmt.setString(5,contact);
+        stmt.setString(6,address);
+        stmt.setString(7,accounttype);
+ 
+        int rs = stmt.executeUpdate();
+        
+        if(rs==1){
+            stmt.close();
+            stmt = this.conn.prepareStatement("Select id from users where password = ?");
+            stmt.setString(1, password);
+            
+            ResultSet result = stmt.executeQuery();
+            
+            if(result.next()){
+                
+                   String account_number = Integer.toString(result.getInt("id"));
+                   
+                   stmt.close();
+                   
+                   stmt = this.conn.prepareStatement("Update users set username = ? where id=?");
+                   
+                   stmt.setString(1, account_number);
+                   stmt.setInt(2, Integer.parseInt(account_number));
+                   
+                   int update_result = stmt.executeUpdate();
+                   
+                   if(update_result==1){
+                       return account_number;
+                   }
+                
+            }
+        }
+        return null;
+    }
+    
+    public JSONObject allActiveAccounts() throws SQLException {   
+        this.conn = Conn.getMysqlConnection();
+        
+        PreparedStatement stmt=this.conn.prepareStatement("SELECT * from users where is_active=1");
+        
+        ResultSet rs = stmt.executeQuery();
+        
+        JSONArray jsonList = new JSONArray();
+
+        while(rs.next()){
+            JSONObject approvals = new JSONObject();
+            approvals.put("username", rs.getString("username"));
+            approvals.put("name", rs.getString("name"));
+            approvals.put("balance", rs.getString("balance"));
+            approvals.put("address",rs.getString("address"));
+            approvals.put("accounttype",rs.getString("accounttype"));
+            approvals.put("contact",rs.getString("contact"));
+            jsonList.add(approvals);
+        }
+        
+        JSONObject data=new JSONObject();
+        data.put("accounts", jsonList);
+        
+        System.out.println("=================================================="+data);
+       
+        return data;   
+    }
+
 
 
     
@@ -587,12 +674,4 @@ public JSONObject allTheLockerRequest() throws SQLException {
     public void setCancellation_date(Date cancellation_date) {
         this.cancellation_date = cancellation_date;
     }
-
-
-
-
-
-
-
-    
 }

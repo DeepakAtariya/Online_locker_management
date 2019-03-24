@@ -25,6 +25,7 @@
   <li class="active"><a data-toggle="tab" href="#home" (click)="refreshQueue()">Locker Application Queue</a></li>
   <li><a data-toggle="tab" href="#menu1" (click)="refreshLocker()">Locker Availability</a></li>
   <li><a data-toggle="tab" href="#menu2" (click)="refreshAppointment()">Locker Appointments</a></li>
+  <li><a data-toggle="tab" href="#menu3" (click)="refreshAccounts()">Active Accounts</a></li>
 </ul>
 
 <div class="tab-content">
@@ -130,6 +131,37 @@
                   <button class="btn btn-danger" (click)="rejectAppointment(data.access_id)">Reject</button>
               </div>
             </td>
+          </tr>
+            
+        </tbody>
+      </table>
+  </div>
+
+  <div id="menu3" class="tab-pane fade">
+    <h3>All Active Accounts </h3>
+
+
+    <table class="table table-responsive table-bordered table-hover ">
+        <thead>
+          <tr>
+            <th>S.no</th>
+            <th>Account Number</th>
+            <th>Account Name</th>
+            <th>Current Balance</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Account Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of accounts; let i=index;">
+            <td>{{i+1}}</td>
+            <td>{{data.username}}</td>
+            <td>{{data.name}}</td>
+            <td>{{data.balance}}</td>
+            <td>{{data.contact}}</td>
+            <td>{{data.address}}</td>
+            <td>{{data.accounttype}}</td>
           </tr>
             
         </tbody>

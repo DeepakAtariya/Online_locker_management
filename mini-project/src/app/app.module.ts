@@ -12,6 +12,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { MainComponent } from './main/main.component';
 import { BankloginComponent } from './banklogin/banklogin.component';
 import { BankdashboardComponent } from './bankdashboard/bankdashboard.component';
+import { OpenAccountComponent } from './open-account/open-account.component';
 
 
 const appRoutes : Routes = [
@@ -29,6 +30,9 @@ const appRoutes : Routes = [
   },
   {
     path : 'bankdashboard', component : BankdashboardComponent
+  },
+  {
+    path : 'account', component : OpenAccountComponent
   }
 ];
 
@@ -39,7 +43,8 @@ const appRoutes : Routes = [
     DashboardComponent,
     MainComponent,
     BankloginComponent,
-    BankdashboardComponent
+    BankdashboardComponent,
+    OpenAccountComponent
   ],
   imports: [
     BrowserModule,

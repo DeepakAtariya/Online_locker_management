@@ -13,6 +13,7 @@ import ignou.miniproject.model.Bank;
 import ignou.miniproject.model.Users;
 import java.sql.SQLException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
  
 import javax.ws.rs.POST;
 //import static javax.ws.rs.HttpMethod.POST;
@@ -29,6 +30,19 @@ public class BankService {
     private Users users= null;
     private Bank bank = null;
 
+    @GET
+    @Path("/active_accounts")
+    public Response activeAccounts() throws SQLException{
+        
+        this.bank = new Bank();
+        
+        JSONObject locker_details = this.bank.allActiveAccounts();
+        
+        
+        return Response.status(200).entity(locker_details.toJSONString()).build();
+    }
+    
+    
 // rejectAppointment
     @POST
     @Path("/rejectAppointment")
