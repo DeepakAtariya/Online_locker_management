@@ -33,6 +33,12 @@ export class OpenAccountComponent implements OnInit {
     if(name=="" || contact=="" || address=="" || openingamount=="" || accounttype=="" || password==""){
       this.warning = "Do not leave blank any field";
     }else{
+      if(openingamount < 1000){
+        alert("Enter amount more than 1000 to open an account");
+      }else if(contact.toString().length<10){
+        alert("Enter valid contact number");
+      }else{
+        
       AppComponent.onShowLoader(1);
       this.http.post("http://localhost:8080/api/miniproject/customer2bank/open_account",account_open_details)
       .subscribe((data)=>{
@@ -48,7 +54,7 @@ export class OpenAccountComponent implements OnInit {
         console.log(error['error']['message']);
       });
     }
-
+  }
 
     
   }
