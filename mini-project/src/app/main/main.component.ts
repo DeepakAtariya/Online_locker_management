@@ -181,13 +181,15 @@ export class MainComponent implements OnInit {
     this.warning = "";
     var datePipe = new DatePipe("en-US");
     var currentDate = datePipe.transform(new Date(),'dd/MM/yyyy');
+    console.log("cuurent date "+currentDate);
+    var currentD = new Date(); 
 
     var givenDate = datePipe.transform(this.request_data.Date, "dd/MM/yyyy");
-    // console.log(val2>val); 
+    console.log("GIven date "+givenDate); 
 
     if(this.request_data.Date == "" || this.request_data.Time == ""){
       this.warning = "Schedule is invalid";
-    }else if (currentDate > givenDate){
+    }else if (currentD > new Date(this.request_data.Date)){
       this.warning = "Schedule is underflowed";
     }else{
       this.warning = "";
@@ -203,7 +205,7 @@ export class MainComponent implements OnInit {
         this.formHide = "none";
         this.lockeraccesspending_message ="block";
 
-        
+         history.go(0);
       },
       error=>{
         AppComponent.onShowLoader(0);
@@ -211,7 +213,7 @@ export class MainComponent implements OnInit {
       });
     }
 
-    history.go(0);
+   
 
   }
 }

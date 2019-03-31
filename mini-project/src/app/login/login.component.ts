@@ -64,6 +64,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem("key",loginData.password);
           this.route.navigate(['\dashboard']);
         }else{
+          alert("Invalid credentials");
           console.log("Invalid credentials");
         }
     },
