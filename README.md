@@ -1,4 +1,4 @@
-# Online_locker_management
+# Online_locker_management using angular and laravel
 A Bank branches maintains a number of different types of safe lockers at some of its safe
 sites. On the request of its customers bank issues a locker to a customer who has an account
 with the bank. A locker can be held jointly by two or more customers also. Bank charges
